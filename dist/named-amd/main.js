@@ -82,7 +82,7 @@ define("ivy-tabs/components/ivy-tab-panel",
 
       'aria-labeledby': Ember.computed.readOnly('tab.elementId'),
 
-      isVisible: Ember.computed.readOnly('active'),
+      isVisible: Ember.computed.readOnly('_isActive'),
 
       registerWithTabsContainer: Ember.on('didInsertElement', function() {
         this.get('tabsContainer').registerTabPanel(this);
