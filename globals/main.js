@@ -43,7 +43,16 @@ exports["default"] = Ember.Component.extend({
   tabsContainer: Ember.computed.readOnly('parentView'),
 
   unregisterTab: function(tab) {
-    this.get('tabs').removeObject(tab);
+    var tabs = this.get('tabs');
+    var index = tab.get('index');
+
+    tabs.removeObject(tab);
+
+    if (tab.get('_isActive')) {
+      if (tabs.get('length') === 0) { return; }
+      if (index > 0) { index--; }
+      tabs.objectAt(index).select();
+    }
   },
 
   unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
@@ -137,6 +146,10 @@ exports["default"] = Ember.Component.extend({
     return this.get('tabsContainer.activeTab') === this;
   }).property('tabsContainer.activeTab'),
 
+  index: Ember.computed(function() {
+    return this.get('tabs').indexOf(this);
+  }).property('tabs.@each'),
+
   registerWithTabList: Ember.on('didInsertElement', function() {
     this.get('tabList').registerTab(this);
   }),
@@ -152,8 +165,8 @@ exports["default"] = Ember.Component.extend({
   tabList: Ember.computed.readOnly('parentView'),
 
   tabPanel: Ember.computed(function() {
-    return this.get('tabPanels').objectAt(this.get('tabs').indexOf(this));
-  }).property('tabPanels.@each'),
+    return this.get('tabPanels').objectAt(this.get('index'));
+  }).property('tabPanels.@each', 'index'),
 
   tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
 

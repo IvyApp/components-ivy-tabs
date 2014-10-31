@@ -45,7 +45,16 @@ define(
       tabsContainer: Ember.computed.readOnly('parentView'),
 
       unregisterTab: function(tab) {
-        this.get('tabs').removeObject(tab);
+        var tabs = this.get('tabs');
+        var index = tab.get('index');
+
+        tabs.removeObject(tab);
+
+        if (tab.get('_isActive')) {
+          if (tabs.get('length') === 0) { return; }
+          if (index > 0) { index--; }
+          tabs.objectAt(index).select();
+        }
       },
 
       unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {

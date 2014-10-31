@@ -34,6 +34,10 @@ exports["default"] = Ember.Component.extend({
     return this.get('tabsContainer.activeTab') === this;
   }).property('tabsContainer.activeTab'),
 
+  index: Ember.computed(function() {
+    return this.get('tabs').indexOf(this);
+  }).property('tabs.@each'),
+
   registerWithTabList: Ember.on('didInsertElement', function() {
     this.get('tabList').registerTab(this);
   }),
@@ -49,8 +53,8 @@ exports["default"] = Ember.Component.extend({
   tabList: Ember.computed.readOnly('parentView'),
 
   tabPanel: Ember.computed(function() {
-    return this.get('tabPanels').objectAt(this.get('tabs').indexOf(this));
-  }).property('tabPanels.@each'),
+    return this.get('tabPanels').objectAt(this.get('index'));
+  }).property('tabPanels.@each', 'index'),
 
   tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
 
