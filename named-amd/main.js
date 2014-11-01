@@ -139,7 +139,7 @@ define("ivy-tabs/components/ivy-tab-panel",
      * @extends Ember.Component
      */
     __exports__["default"] = Ember.Component.extend({
-      attributeBindings: ['aria-labeledby', 'role'],
+      attributeBindings: ['aria-labelledby', 'role'],
       classNames: ['ivy-tab-panel'],
       classNameBindings: ['active'],
 
@@ -148,11 +148,11 @@ define("ivy-tabs/components/ivy-tab-panel",
        *
        * See http://www.w3.org/TR/wai-aria/states_and_properties#aria-labelledby
        *
-       * @property aria-labeledby
+       * @property aria-labelledby
        * @type String
        * @readOnly
        */
-      'aria-labeledby': Ember.computed.alias('tab.elementId').readOnly(),
+      'aria-labelledby': Ember.computed.alias('tab.elementId').readOnly(),
 
       /**
        * See http://www.w3.org/TR/wai-aria/roles#tabpanel
