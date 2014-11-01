@@ -1,68 +1,192 @@
 "use strict";
 var Ember = require("ember")["default"] || require("ember");
 
+/**
+ * @module ivy-tabs
+ */
+
+/**
+ * @class IvyTabComponent
+ * @namespace ivy.tabs
+ * @extends Ember.Component
+ */
 exports["default"] = Ember.Component.extend({
+  tagName: 'li',
+  attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected', 'role', 'selected', 'tabindex'],
   classNames: ['ivy-tab'],
   classNameBindings: ['active'],
-  tagName: 'li',
-  attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected',
-                      'role', 'selected', 'tabindex'],
 
   /**
+   * Tells screenreaders which panel this tab controls.
+   *
+   * See http://www.w3.org/TR/wai-aria/states_and_properties#aria-controls
+   *
+   * @property aria-controls
+   * @type String
+   * @readOnly
+   */
+  'aria-controls': Ember.computed.alias('tabPanel.elementId').readOnly(),
+
+  /**
+   * Tells screenreaders whether or not this tab's panel is expanded.
+   *
+   * See http://www.w3.org/TR/wai-aria/states_and_properties#aria-expanded
+   *
+   * @property aria-expanded
+   * @type String
+   * @readOnly
+   */
+  'aria-expanded': Ember.computed.alias('aria-selected').readOnly(),
+
+  /**
+   * Tells screenreaders whether or not this tab is selected.
+   *
+   * See http://www.w3.org/TR/wai-aria/states_and_properties#aria-selected
+   *
+   * @property aria-selected
+   * @type String
+   */
+  'aria-selected': Ember.computed(function() {
+    return this.get('isSelected') + ''; // coerce to 'true' or 'false'
+  }).property('isSelected'),
+
+  /**
+   * The `role` attribute of the tab element.
+   *
    * See http://www.w3.org/TR/wai-aria/roles#tab
    *
    * @property role
-   * @type {String}
+   * @type String
+   * @default 'tab'
    */
   role: 'tab',
 
+  /**
+   * The `selected` attribute of the tab element. If the tab's `isSelected`
+   * property is `true` this will be the literal string 'selected', otherwise
+   * it will be `undefined`.
+   *
+   * @property selected
+   * @type String
+   */
+  selected: Ember.computed(function() {
+    if (this.get('isSelected')) { return 'selected'; }
+  }).property('isSelected'),
+
+  /**
+   * Makes the selected tab keyboard tabbable, and prevents tabs from getting
+   * focus when clicked with a mouse.
+   *
+   * @property tabindex
+   * @type Number
+   */
+  tabindex: Ember.computed(function() {
+    if (this.get('isSelected')) { return 0; }
+  }).property('isSelected'),
+
+  /**
+   * Accessed as a className binding to apply the tab's `activeClass` CSS class
+   * to the element when the tab's `isSelected` property is true.
+   *
+   * @property active
+   * @type String
+   * @readOnly
+   */
+  active: Ember.computed(function() {
+    if (this.get('isSelected')) { return this.get('activeClass'); }
+  }).property('isSelected'),
+
+  /**
+   * The CSS class to apply to a tab's element when its `isSelected` property
+   * is `true`.
+   *
+   * @property activeClass
+   * @type String
+   * @default 'active'
+   */
   activeClass: 'active',
 
-  'aria-controls': Ember.computed.readOnly('tabPanel.elementId'),
+  /**
+   * The index of this tab in the `ivy-tab-list` component.
+   *
+   * @property index
+   * @type Number
+   */
+  index: Ember.computed(function() {
+    return this.get('tabs').indexOf(this);
+  }).property('tabs.[]'),
 
-  'aria-expanded': Ember.computed.readOnly('aria-selected'),
+  /**
+   * Whether or not this tab is selected.
+   *
+   * @property isSelected
+   * @type Boolean
+   */
+  isSelected: Ember.computed(function() {
+    return this.get('tabList.selectedTab') === this;
+  }).property('tabList.selectedTab'),
 
-  'aria-selected': Ember.computed(function() {
-    return this.get('_isActive') + ''; // coerce to 'true' or 'false'
-  }).property('_isActive'),
-
-  active: Ember.computed(function() {
-    return this.get('_isActive') ? this.get('activeClass') : false;
-  }).property('_isActive', 'activeClass'),
-
-  _isActive: Ember.computed(function() {
-    return this.get('tabsContainer.activeTab') === this;
-  }).property('tabsContainer.activeTab'),
-
-  registerWithTabList: Ember.on('didInsertElement', function() {
-    this.get('tabList').registerTab(this);
-  }),
-
+  /**
+   * Called when the user clicks on the tab. Selects this tab.
+   *
+   * @method select
+   */
   select: Ember.on('click', function() {
     this.get('tabList').selectTab(this);
   }),
 
-  selected: Ember.computed(function() {
-    if (this.get('_isActive')) { return 'selected'; }
-  }).property('_isActive'),
+  /**
+   * The `ivy-tab-list` component this tab belongs to.
+   *
+   * @property tabList
+   * @type ivy.tabs.IvyTabListComponent
+   * @readOnly
+   */
+  tabList: Ember.computed.alias('parentView').readOnly(),
 
-  tabList: Ember.computed.readOnly('parentView'),
-
+  /**
+   * The `ivy-tab-panel` associated with this tab.
+   *
+   * @property tabPanel
+   * @type ivy.tabs.IvyTabPanelComponent
+   */
   tabPanel: Ember.computed(function() {
-    return this.get('tabPanels').objectAt(this.get('tabs').indexOf(this));
-  }).property('tabPanels.@each'),
+    return this.get('tabPanels').objectAt(this.get('index'));
+  }).property('tabPanels.[]', 'index'),
 
-  tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
+  /**
+   * The array of all `ivy-tab-panel` instances within the `ivy-tabs`
+   * component.
+   *
+   * @property tabPanels
+   * @type Array | ivy.tabs.IvyTabPanelComponent
+   * @readOnly
+   */
+  tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
 
-  tabindex: Ember.computed(function() {
-    if (this.get('_isActive')) { return 0; }
-  }).property('_isActive'),
+  /**
+   * The array of all `ivy-tab` instances within the `ivy-tab-list` component.
+   *
+   * @property tabs
+   * @type Array | ivy.tabs.IvyTabComponent
+   * @readOnly
+   */
+  tabs: Ember.computed.alias('tabList.tabs').readOnly(),
 
-  tabs: Ember.computed.readOnly('tabList.tabs'),
+  /**
+   * The `ivy-tabs` component.
+   *
+   * @property tabsContainer
+   * @type ivy.tabs.IvyTabsComponent
+   * @readOnly
+   */
+  tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
 
-  tabsContainer: Ember.computed.readOnly('tabList.tabsContainer'),
+  _registerWithTabList: Ember.on('didInsertElement', function() {
+    this.get('tabList').registerTab(this);
+  }),
 
-  unregisterWithTabList: Ember.on('willDestroyElement', function() {
+  _unregisterWithTabList: Ember.on('willDestroyElement', function() {
     this.get('tabList').unregisterTab(this);
   })
 });
