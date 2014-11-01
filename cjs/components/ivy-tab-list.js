@@ -2,24 +2,17 @@
 var Ember = require("ember")["default"] || require("ember");
 
 exports["default"] = Ember.Component.extend({
-  classNames: ['ivy-tab-list'],
   tagName: 'ul',
   attributeBindings: ['aria-multiselectable', 'role'],
-
-  /**
-   * See http://www.w3.org/TR/wai-aria/roles#tablist
-   *
-   * @property role
-   * @type {String}
-   */
-  role: 'tablist',
+  classNames: ['ivy-tab-list'],
 
   'aria-multiselectable': 'false',
 
-  init: function() {
-    this._super();
+  role: 'tablist',
+
+  initTabs: Ember.on('init', function() {
     this.set('tabs', Ember.A());
-  },
+  }),
 
   registerTab: function(tab) {
     this.get('tabs').pushObject(tab);
@@ -29,29 +22,30 @@ exports["default"] = Ember.Component.extend({
     this.get('tabsContainer').registerTabList(this);
   }),
 
+  selectPreviousTab: function() {
+    var index = this.get('selectedIndex');
+    if (index > 0) { this.selectTabByIndex(index - 1); }
+  },
+
+  selectedIndex: Ember.computed.alias('tabsContainer.selectedIndex'),
+
+  selectedTab: Ember.computed(function() {
+    return this.get('tabs').objectAt(this.get('selectedIndex'));
+  }).property('selectedIndex', 'tabs.[]'),
 
   selectTab: function(tab) {
-    this.get('tabsContainer').selectTab(tab);
+    this.selectTabByIndex(this.get('tabs').indexOf(tab));
   },
 
-  selectTabAtIndex: function(index) {
-    var tab = this.get('tabs').objectAt(index);
-    if (tab) { tab.select(); }
+  selectTabByIndex: function(index) {
+    this.set('selectedIndex', index);
   },
 
-  tabsContainer: Ember.computed.readOnly('parentView'),
+  tabsContainer: Ember.computed.alias('parentView').readOnly(),
 
   unregisterTab: function(tab) {
-    var tabs = this.get('tabs');
-    var index = tab.get('index');
-
-    tabs.removeObject(tab);
-
-    if (tab.get('_isActive')) {
-      if (tabs.get('length') === 0) { return; }
-      if (index > 0) { index--; }
-      tabs.objectAt(index).select();
-    }
+    this.get('tabs').removeObject(tab);
+    if (tab.get('isSelected')) { this.selectPreviousTab(); }
   },
 
   unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {

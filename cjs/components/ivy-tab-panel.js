@@ -2,29 +2,27 @@
 var Ember = require("ember")["default"] || require("ember");
 
 exports["default"] = Ember.Component.extend({
+  attributeBindings: ['aria-labeledby', 'role'],
   classNames: ['ivy-tab-panel'],
   classNameBindings: ['active'],
-  attributeBindings: ['aria-labeledby', 'role'],
 
-  /**
-   * See http://www.w3.org/TR/wai-aria/roles#tabpanel
-   *
-   * @property role
-   * @type {String}
-   */
+  'aria-labeledby': Ember.computed.alias('tab.elementId').readOnly(),
+
   role: 'tabpanel',
+
+  active: Ember.computed(function() {
+    if (this.get('isSelected')) { return this.get('activeClass'); }
+  }).property('isSelected'),
 
   activeClass: 'active',
 
-  _isActive: Ember.computed.readOnly('tab._isActive'),
+  index: Ember.computed(function() {
+    return this.get('tabPanels').indexOf(this);
+  }).property('tabPanels.[]'),
 
-  active: Ember.computed(function() {
-    return this.get('_isActive') ? this.get('activeClass') : false;
-  }).property('_isActive', 'activeClass'),
+  isSelected: Ember.computed.alias('tab.isSelected').readOnly(),
 
-  'aria-labeledby': Ember.computed.readOnly('tab.elementId'),
-
-  isVisible: Ember.computed.readOnly('_isActive'),
+  isVisible: Ember.computed.alias('isSelected').readOnly(),
 
   registerWithTabsContainer: Ember.on('didInsertElement', function() {
     this.get('tabsContainer').registerTabPanel(this);
@@ -32,18 +30,18 @@ exports["default"] = Ember.Component.extend({
 
   tab: Ember.computed(function() {
     var tabs = this.get('tabs');
-    if (tabs) { return tabs.objectAt(this.get('tabPanels').indexOf(this)); }
-  }).property('tabs.@each', 'tabPanels.@each'),
+    if (tabs) { return tabs.objectAt(this.get('index')); }
+  }).property('tabs.[]', 'index'),
 
-  tabList: Ember.computed.readOnly('tabsContainer.tabList'),
+  tabList: Ember.computed.alias('tabsContainer.tabList').readOnly(),
 
-  tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
+  tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
 
-  tabs: Ember.computed.readOnly('tabList.tabs'),
+  tabs: Ember.computed.alias('tabList.tabs').readOnly(),
 
-  tabsContainer: Ember.computed.readOnly('parentView'),
+  tabsContainer: Ember.computed.alias('parentView').readOnly(),
 
   unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
     this.get('tabsContainer').unregisterTabPanel(this);
-  })
+  }),
 });

@@ -5,41 +5,42 @@ define(
     var Ember = __dependency1__["default"] || __dependency1__;
 
     __exports__["default"] = Ember.Component.extend({
+      tagName: 'li',
+      attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected', 'role', 'selected', 'tabindex'],
       classNames: ['ivy-tab'],
       classNameBindings: ['active'],
-      tagName: 'li',
-      attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected',
-                          'role', 'selected', 'tabindex'],
 
-      /**
-       * See http://www.w3.org/TR/wai-aria/roles#tab
-       *
-       * @property role
-       * @type {String}
-       */
+      'aria-controls': Ember.computed.alias('tabPanel.elementId').readOnly(),
+
+      'aria-expanded': Ember.computed.alias('aria-selected'),
+
+      'aria-selected': Ember.computed(function() {
+        return this.get('isSelected') + ''; // coerce to 'true' or 'false'
+      }).property('isSelected'),
+
       role: 'tab',
+
+      selected: Ember.computed(function() {
+        if (this.get('isSelected')) { return 'selected'; }
+      }).property('isSelected'),
+
+      tabindex: Ember.computed(function() {
+        if (this.get('isSelected')) { return 0; }
+      }).property('isSelected'),
+
+      active: Ember.computed(function() {
+        if (this.get('isSelected')) { return this.get('activeClass'); }
+      }).property('isSelected'),
 
       activeClass: 'active',
 
-      'aria-controls': Ember.computed.readOnly('tabPanel.elementId'),
-
-      'aria-expanded': Ember.computed.readOnly('aria-selected'),
-
-      'aria-selected': Ember.computed(function() {
-        return this.get('_isActive') + ''; // coerce to 'true' or 'false'
-      }).property('_isActive'),
-
-      active: Ember.computed(function() {
-        return this.get('_isActive') ? this.get('activeClass') : false;
-      }).property('_isActive', 'activeClass'),
-
-      _isActive: Ember.computed(function() {
-        return this.get('tabsContainer.activeTab') === this;
-      }).property('tabsContainer.activeTab'),
-
       index: Ember.computed(function() {
         return this.get('tabs').indexOf(this);
-      }).property('tabs.@each'),
+      }).property('tabs.[]'),
+
+      isSelected: Ember.computed(function() {
+        return this.get('tabList.selectedTab') === this;
+      }).property('tabList.selectedTab'),
 
       registerWithTabList: Ember.on('didInsertElement', function() {
         this.get('tabList').registerTab(this);
@@ -49,25 +50,17 @@ define(
         this.get('tabList').selectTab(this);
       }),
 
-      selected: Ember.computed(function() {
-        if (this.get('_isActive')) { return 'selected'; }
-      }).property('_isActive'),
-
-      tabList: Ember.computed.readOnly('parentView'),
+      tabList: Ember.computed.alias('parentView').readOnly(),
 
       tabPanel: Ember.computed(function() {
         return this.get('tabPanels').objectAt(this.get('index'));
-      }).property('tabPanels.@each', 'index'),
+      }).property('tabPanels.[]', 'index'),
 
-      tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
+      tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
 
-      tabindex: Ember.computed(function() {
-        if (this.get('_isActive')) { return 0; }
-      }).property('_isActive'),
+      tabs: Ember.computed.alias('tabList.tabs').readOnly(),
 
-      tabs: Ember.computed.readOnly('tabList.tabs'),
-
-      tabsContainer: Ember.computed.readOnly('tabList.tabsContainer'),
+      tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
 
       unregisterWithTabList: Ember.on('willDestroyElement', function() {
         this.get('tabList').unregisterTab(this);

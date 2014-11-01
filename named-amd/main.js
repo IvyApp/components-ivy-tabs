@@ -5,24 +5,17 @@ define("ivy-tabs/components/ivy-tab-list",
     var Ember = __dependency1__["default"] || __dependency1__;
 
     __exports__["default"] = Ember.Component.extend({
-      classNames: ['ivy-tab-list'],
       tagName: 'ul',
       attributeBindings: ['aria-multiselectable', 'role'],
-
-      /**
-       * See http://www.w3.org/TR/wai-aria/roles#tablist
-       *
-       * @property role
-       * @type {String}
-       */
-      role: 'tablist',
+      classNames: ['ivy-tab-list'],
 
       'aria-multiselectable': 'false',
 
-      init: function() {
-        this._super();
+      role: 'tablist',
+
+      initTabs: Ember.on('init', function() {
         this.set('tabs', Ember.A());
-      },
+      }),
 
       registerTab: function(tab) {
         this.get('tabs').pushObject(tab);
@@ -32,29 +25,30 @@ define("ivy-tabs/components/ivy-tab-list",
         this.get('tabsContainer').registerTabList(this);
       }),
 
+      selectPreviousTab: function() {
+        var index = this.get('selectedIndex');
+        if (index > 0) { this.selectTabByIndex(index - 1); }
+      },
+
+      selectedIndex: Ember.computed.alias('tabsContainer.selectedIndex'),
+
+      selectedTab: Ember.computed(function() {
+        return this.get('tabs').objectAt(this.get('selectedIndex'));
+      }).property('selectedIndex', 'tabs.[]'),
 
       selectTab: function(tab) {
-        this.get('tabsContainer').selectTab(tab);
+        this.selectTabByIndex(this.get('tabs').indexOf(tab));
       },
 
-      selectTabAtIndex: function(index) {
-        var tab = this.get('tabs').objectAt(index);
-        if (tab) { tab.select(); }
+      selectTabByIndex: function(index) {
+        this.set('selectedIndex', index);
       },
 
-      tabsContainer: Ember.computed.readOnly('parentView'),
+      tabsContainer: Ember.computed.alias('parentView').readOnly(),
 
       unregisterTab: function(tab) {
-        var tabs = this.get('tabs');
-        var index = tab.get('index');
-
-        tabs.removeObject(tab);
-
-        if (tab.get('_isActive')) {
-          if (tabs.get('length') === 0) { return; }
-          if (index > 0) { index--; }
-          tabs.objectAt(index).select();
-        }
+        this.get('tabs').removeObject(tab);
+        if (tab.get('isSelected')) { this.selectPreviousTab(); }
       },
 
       unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
@@ -69,29 +63,27 @@ define("ivy-tabs/components/ivy-tab-panel",
     var Ember = __dependency1__["default"] || __dependency1__;
 
     __exports__["default"] = Ember.Component.extend({
+      attributeBindings: ['aria-labeledby', 'role'],
       classNames: ['ivy-tab-panel'],
       classNameBindings: ['active'],
-      attributeBindings: ['aria-labeledby', 'role'],
 
-      /**
-       * See http://www.w3.org/TR/wai-aria/roles#tabpanel
-       *
-       * @property role
-       * @type {String}
-       */
+      'aria-labeledby': Ember.computed.alias('tab.elementId').readOnly(),
+
       role: 'tabpanel',
+
+      active: Ember.computed(function() {
+        if (this.get('isSelected')) { return this.get('activeClass'); }
+      }).property('isSelected'),
 
       activeClass: 'active',
 
-      _isActive: Ember.computed.readOnly('tab._isActive'),
+      index: Ember.computed(function() {
+        return this.get('tabPanels').indexOf(this);
+      }).property('tabPanels.[]'),
 
-      active: Ember.computed(function() {
-        return this.get('_isActive') ? this.get('activeClass') : false;
-      }).property('_isActive', 'activeClass'),
+      isSelected: Ember.computed.alias('tab.isSelected').readOnly(),
 
-      'aria-labeledby': Ember.computed.readOnly('tab.elementId'),
-
-      isVisible: Ember.computed.readOnly('_isActive'),
+      isVisible: Ember.computed.alias('isSelected').readOnly(),
 
       registerWithTabsContainer: Ember.on('didInsertElement', function() {
         this.get('tabsContainer').registerTabPanel(this);
@@ -99,20 +91,20 @@ define("ivy-tabs/components/ivy-tab-panel",
 
       tab: Ember.computed(function() {
         var tabs = this.get('tabs');
-        if (tabs) { return tabs.objectAt(this.get('tabPanels').indexOf(this)); }
-      }).property('tabs.@each', 'tabPanels.@each'),
+        if (tabs) { return tabs.objectAt(this.get('index')); }
+      }).property('tabs.[]', 'index'),
 
-      tabList: Ember.computed.readOnly('tabsContainer.tabList'),
+      tabList: Ember.computed.alias('tabsContainer.tabList').readOnly(),
 
-      tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
+      tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
 
-      tabs: Ember.computed.readOnly('tabList.tabs'),
+      tabs: Ember.computed.alias('tabList.tabs').readOnly(),
 
-      tabsContainer: Ember.computed.readOnly('parentView'),
+      tabsContainer: Ember.computed.alias('parentView').readOnly(),
 
       unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
         this.get('tabsContainer').unregisterTabPanel(this);
-      })
+      }),
     });
   });
 define("ivy-tabs/components/ivy-tab",
@@ -122,41 +114,42 @@ define("ivy-tabs/components/ivy-tab",
     var Ember = __dependency1__["default"] || __dependency1__;
 
     __exports__["default"] = Ember.Component.extend({
+      tagName: 'li',
+      attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected', 'role', 'selected', 'tabindex'],
       classNames: ['ivy-tab'],
       classNameBindings: ['active'],
-      tagName: 'li',
-      attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected',
-                          'role', 'selected', 'tabindex'],
 
-      /**
-       * See http://www.w3.org/TR/wai-aria/roles#tab
-       *
-       * @property role
-       * @type {String}
-       */
+      'aria-controls': Ember.computed.alias('tabPanel.elementId').readOnly(),
+
+      'aria-expanded': Ember.computed.alias('aria-selected'),
+
+      'aria-selected': Ember.computed(function() {
+        return this.get('isSelected') + ''; // coerce to 'true' or 'false'
+      }).property('isSelected'),
+
       role: 'tab',
+
+      selected: Ember.computed(function() {
+        if (this.get('isSelected')) { return 'selected'; }
+      }).property('isSelected'),
+
+      tabindex: Ember.computed(function() {
+        if (this.get('isSelected')) { return 0; }
+      }).property('isSelected'),
+
+      active: Ember.computed(function() {
+        if (this.get('isSelected')) { return this.get('activeClass'); }
+      }).property('isSelected'),
 
       activeClass: 'active',
 
-      'aria-controls': Ember.computed.readOnly('tabPanel.elementId'),
-
-      'aria-expanded': Ember.computed.readOnly('aria-selected'),
-
-      'aria-selected': Ember.computed(function() {
-        return this.get('_isActive') + ''; // coerce to 'true' or 'false'
-      }).property('_isActive'),
-
-      active: Ember.computed(function() {
-        return this.get('_isActive') ? this.get('activeClass') : false;
-      }).property('_isActive', 'activeClass'),
-
-      _isActive: Ember.computed(function() {
-        return this.get('tabsContainer.activeTab') === this;
-      }).property('tabsContainer.activeTab'),
-
       index: Ember.computed(function() {
         return this.get('tabs').indexOf(this);
-      }).property('tabs.@each'),
+      }).property('tabs.[]'),
+
+      isSelected: Ember.computed(function() {
+        return this.get('tabList.selectedTab') === this;
+      }).property('tabList.selectedTab'),
 
       registerWithTabList: Ember.on('didInsertElement', function() {
         this.get('tabList').registerTab(this);
@@ -166,25 +159,17 @@ define("ivy-tabs/components/ivy-tab",
         this.get('tabList').selectTab(this);
       }),
 
-      selected: Ember.computed(function() {
-        if (this.get('_isActive')) { return 'selected'; }
-      }).property('_isActive'),
-
-      tabList: Ember.computed.readOnly('parentView'),
+      tabList: Ember.computed.alias('parentView').readOnly(),
 
       tabPanel: Ember.computed(function() {
         return this.get('tabPanels').objectAt(this.get('index'));
-      }).property('tabPanels.@each', 'index'),
+      }).property('tabPanels.[]', 'index'),
 
-      tabPanels: Ember.computed.readOnly('tabsContainer.tabPanels'),
+      tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
 
-      tabindex: Ember.computed(function() {
-        if (this.get('_isActive')) { return 0; }
-      }).property('_isActive'),
+      tabs: Ember.computed.alias('tabList.tabs').readOnly(),
 
-      tabs: Ember.computed.readOnly('tabList.tabs'),
-
-      tabsContainer: Ember.computed.readOnly('tabList.tabsContainer'),
+      tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
 
       unregisterWithTabList: Ember.on('willDestroyElement', function() {
         this.get('tabList').unregisterTab(this);
@@ -198,45 +183,28 @@ define("ivy-tabs/components/ivy-tabs",
     var Ember = __dependency1__["default"] || __dependency1__;
 
     __exports__["default"] = Ember.Component.extend({
-      activeTab: null,
-
       classNames: ['ivy-tabs'],
 
-      init: function() {
-        this._super();
+      selectedIndex: 0,
+
+      initTabPanels: Ember.on('init', function() {
         this.set('tabPanels', Ember.A());
-      },
+      }),
 
       registerTabList: function(tabList) {
         this.set('tabList', tabList);
-        this.addObserver('selectedIndex', this, this._selectedIndexDidChange);
-        Ember.run.once(this, this._selectedIndexDidChange);
       },
 
       registerTabPanel: function(tabPanel) {
         this.get('tabPanels').pushObject(tabPanel);
       },
 
-      selectTab: function(tab) {
-        this.set('activeTab', tab);
-      },
-
-      selectedIndex: 0,
-
-      tabList: null,
-
-      tabPanels: null,
-
       unregisterTabList: function(tabList) {
-        this.removeObserver('selectedIndex', this, this._selectedIndexDidChange);
+        this.set('tabList', null);
       },
 
       unregisterTabPanel: function(tabPanel) {
         this.get('tabPanels').removeObject(tabPanel);
-      },
-
-      _selectedIndexDidChange: function() {
-        this.get('tabList').selectTabAtIndex(this.get('selectedIndex'));
       }
     });
   });
