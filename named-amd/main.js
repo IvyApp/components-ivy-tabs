@@ -121,7 +121,7 @@ define("ivy-tabs/components/ivy-tab",
 
       'aria-controls': Ember.computed.alias('tabPanel.elementId').readOnly(),
 
-      'aria-expanded': Ember.computed.alias('aria-selected'),
+      'aria-expanded': Ember.computed.alias('aria-selected').readOnly(),
 
       'aria-selected': Ember.computed(function() {
         return this.get('isSelected') + ''; // coerce to 'true' or 'false'
