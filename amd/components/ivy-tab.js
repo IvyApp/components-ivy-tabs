@@ -19,6 +19,16 @@ define(
       classNames: ['ivy-tab'],
       classNameBindings: ['active'],
 
+      init: function() {
+        this._super();
+        Ember.run.once(this, this._registerWithTabList);
+      },
+
+      willDestroy: function() {
+        this._super();
+        Ember.run.once(this, this._unregisterWithTabList);
+      },
+
       /**
        * Tells screenreaders which panel this tab controls.
        *
@@ -185,12 +195,12 @@ define(
        */
       tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
 
-      _registerWithTabList: Ember.on('didInsertElement', function() {
+      _registerWithTabList: function() {
         this.get('tabList').registerTab(this);
-      }),
+      },
 
-      _unregisterWithTabList: Ember.on('willDestroyElement', function() {
+      _unregisterWithTabList: function() {
         this.get('tabList').unregisterTab(this);
-      })
+      }
     });
   });

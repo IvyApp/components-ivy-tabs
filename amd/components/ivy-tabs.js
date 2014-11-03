@@ -16,6 +16,11 @@ define(
     __exports__["default"] = Ember.Component.extend({
       classNames: ['ivy-tabs'],
 
+      init: function() {
+        this._super();
+        this._initTabPanels();
+      },
+
       /**
        * Set this to the index of the tab you'd like to be selected. Usually it is
        * bound to a controller property that is used as a query parameter, but can
@@ -67,8 +72,8 @@ define(
         this.get('tabPanels').removeObject(tabPanel);
       },
 
-      _initTabPanels: Ember.on('init', function() {
+      _initTabPanels: function() {
         this.set('tabPanels', Ember.A());
-      })
+      }
     });
   });

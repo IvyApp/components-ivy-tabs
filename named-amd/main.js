@@ -18,6 +18,16 @@ define("ivy-tabs/components/ivy-tab-list",
       attributeBindings: ['aria-multiselectable', 'role'],
       classNames: ['ivy-tab-list'],
 
+      init: function() {
+        this._super();
+        Ember.run.once(this, this._registerWithTabsContainer);
+      },
+
+      willDestroy: function() {
+        this._super();
+        Ember.run.once(this, this._unregisterWithTabsContainer);
+      },
+
       /**
        * Tells screenreaders that only one tab can be selected at a time.
        *
@@ -114,13 +124,13 @@ define("ivy-tabs/components/ivy-tab-list",
         this.set('tabs', Ember.A());
       }),
 
-      _registerWithTabsContainer: Ember.on('didInsertElement', function() {
+      _registerWithTabsContainer: function() {
         this.get('tabsContainer').registerTabList(this);
-      }),
+      },
 
-      _unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
+      _unregisterWithTabsContainer: function() {
         this.get('tabsContainer').unregisterTabList(this);
-      })
+      }
     });
   });
 define("ivy-tabs/components/ivy-tab-panel",
@@ -142,6 +152,16 @@ define("ivy-tabs/components/ivy-tab-panel",
       attributeBindings: ['aria-labelledby', 'role'],
       classNames: ['ivy-tab-panel'],
       classNameBindings: ['active'],
+
+      init: function() {
+        this._super();
+        Ember.run.once(this, this._registerWithTabsContainer);
+      },
+
+      willDestroy: function() {
+        this._super();
+        Ember.run.once(this, this._unregisterWithTabsContainer);
+      },
 
       /**
        * Tells screenreaders which tab labels this panel.
@@ -262,13 +282,13 @@ define("ivy-tabs/components/ivy-tab-panel",
        */
       tabsContainer: Ember.computed.alias('parentView').readOnly(),
 
-      _registerWithTabsContainer: Ember.on('didInsertElement', function() {
+      _registerWithTabsContainer: function() {
         this.get('tabsContainer').registerTabPanel(this);
-      }),
+      },
 
-      _unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
+      _unregisterWithTabsContainer: function() {
         this.get('tabsContainer').unregisterTabPanel(this);
-      })
+      }
     });
   });
 define("ivy-tabs/components/ivy-tab",
@@ -291,6 +311,16 @@ define("ivy-tabs/components/ivy-tab",
       attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected', 'role', 'selected', 'tabindex'],
       classNames: ['ivy-tab'],
       classNameBindings: ['active'],
+
+      init: function() {
+        this._super();
+        Ember.run.once(this, this._registerWithTabList);
+      },
+
+      willDestroy: function() {
+        this._super();
+        Ember.run.once(this, this._unregisterWithTabList);
+      },
 
       /**
        * Tells screenreaders which panel this tab controls.
@@ -458,13 +488,13 @@ define("ivy-tabs/components/ivy-tab",
        */
       tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
 
-      _registerWithTabList: Ember.on('didInsertElement', function() {
+      _registerWithTabList: function() {
         this.get('tabList').registerTab(this);
-      }),
+      },
 
-      _unregisterWithTabList: Ember.on('willDestroyElement', function() {
+      _unregisterWithTabList: function() {
         this.get('tabList').unregisterTab(this);
-      })
+      }
     });
   });
 define("ivy-tabs/components/ivy-tabs",
@@ -484,6 +514,11 @@ define("ivy-tabs/components/ivy-tabs",
      */
     __exports__["default"] = Ember.Component.extend({
       classNames: ['ivy-tabs'],
+
+      init: function() {
+        this._super();
+        this._initTabPanels();
+      },
 
       /**
        * Set this to the index of the tab you'd like to be selected. Usually it is
@@ -536,9 +571,9 @@ define("ivy-tabs/components/ivy-tabs",
         this.get('tabPanels').removeObject(tabPanel);
       },
 
-      _initTabPanels: Ember.on('init', function() {
+      _initTabPanels: function() {
         this.set('tabPanels', Ember.A());
-      })
+      }
     });
   });
 define("ivy-tabs/initializer",

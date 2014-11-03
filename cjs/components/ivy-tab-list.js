@@ -15,6 +15,16 @@ exports["default"] = Ember.Component.extend({
   attributeBindings: ['aria-multiselectable', 'role'],
   classNames: ['ivy-tab-list'],
 
+  init: function() {
+    this._super();
+    Ember.run.once(this, this._registerWithTabsContainer);
+  },
+
+  willDestroy: function() {
+    this._super();
+    Ember.run.once(this, this._unregisterWithTabsContainer);
+  },
+
   /**
    * Tells screenreaders that only one tab can be selected at a time.
    *
@@ -111,11 +121,11 @@ exports["default"] = Ember.Component.extend({
     this.set('tabs', Ember.A());
   }),
 
-  _registerWithTabsContainer: Ember.on('didInsertElement', function() {
+  _registerWithTabsContainer: function() {
     this.get('tabsContainer').registerTabList(this);
-  }),
+  },
 
-  _unregisterWithTabsContainer: Ember.on('willDestroyElement', function() {
+  _unregisterWithTabsContainer: function() {
     this.get('tabsContainer').unregisterTabList(this);
-  })
+  }
 });
