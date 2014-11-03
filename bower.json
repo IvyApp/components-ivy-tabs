@@ -1,11 +1,11 @@
 {
   "name": "ivy-tabs",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "authors": [
     "Dray Lacy"
   ],
   "description": "WAI-ARIA accessible tab component for Ember.",
-  "main": "dist/globals/main.js",
+  "main": "./globals/main.js",
   "moduleType": [
     "amd",
     "globals",
