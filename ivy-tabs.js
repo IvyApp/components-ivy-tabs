@@ -1,31 +1,20 @@
-define("ivy-tabs/components/ivy-tab-list",
-  ["ember","exports"],
-  function(__dependency1__, __exports__) {
+(function() {
     "use strict";
-    var Ember = __dependency1__["default"] || __dependency1__;
+    var ember$$default = Ember;
 
-    /**
-     * @module ivy-tabs
-     */
-
-    /**
-     * @class IvyTabListComponent
-     * @namespace ivy.tabs
-     * @extends Ember.Component
-     */
-    __exports__["default"] = Ember.Component.extend({
+    var components$ivy$tab$list$$default = ember$$default.Component.extend({
       tagName: 'ul',
       attributeBindings: ['aria-multiselectable', 'role'],
       classNames: ['ivy-tab-list'],
 
       init: function() {
         this._super();
-        Ember.run.once(this, this._registerWithTabsContainer);
+        ember$$default.run.once(this, this._registerWithTabsContainer);
       },
 
       willDestroy: function() {
         this._super();
-        Ember.run.once(this, this._unregisterWithTabsContainer);
+        ember$$default.run.once(this, this._unregisterWithTabsContainer);
       },
 
       /**
@@ -65,7 +54,7 @@ define("ivy-tabs/components/ivy-tab-list",
        * @method navigateOnKeyDown
        * @param {Event} event
        */
-      navigateOnKeyDown: Ember.on('keyDown', function(event) {
+      navigateOnKeyDown: ember$$default.on('keyDown', function(event) {
         switch (event.keyCode) {
         case 37: /* left */
         case 38: /* up */
@@ -80,7 +69,7 @@ define("ivy-tabs/components/ivy-tab-list",
         }
 
         event.preventDefault();
-        Ember.run.scheduleOnce('afterRender', this, this.focusSelectedTab);
+        ember$$default.run.scheduleOnce('afterRender', this, this.focusSelectedTab);
       }),
 
       /**
@@ -99,7 +88,7 @@ define("ivy-tabs/components/ivy-tab-list",
        * @method selectNextTab
        */
       selectNextTab: function() {
-        var index = this.get('selectedIndex') + 1;
+        var index = this.get('selected-index') + 1;
         if (index === this.get('tabs.length')) { index = 0; }
         this.selectTabByIndex(index);
       },
@@ -110,12 +99,12 @@ define("ivy-tabs/components/ivy-tab-list",
        * @method selectPreviousTab
        */
       selectPreviousTab: function() {
-        var index = this.get('selectedIndex') - 1;
+        var index = this.get('selected-index') - 1;
         if (index === -1) { index = this.get('tabs.length') - 1; }
         this.selectTabByIndex(index);
       },
 
-      selectedIndex: Ember.computed.alias('tabsContainer.selectedIndex'),
+      'selected-index': ember$$default.computed.alias('tabsContainer.selected-index'),
 
       /**
        * The currently-selected `ivy-tab` instance.
@@ -123,9 +112,9 @@ define("ivy-tabs/components/ivy-tab-list",
        * @property selectedTab
        * @type ivy.tabs.IvyTabComponent
        */
-      selectedTab: Ember.computed(function() {
-        return this.get('tabs').objectAt(this.get('selectedIndex'));
-      }).property('selectedIndex', 'tabs.[]'),
+      selectedTab: ember$$default.computed(function() {
+        return this.get('tabs').objectAt(this.get('selected-index'));
+      }).property('selected-index', 'tabs.[]'),
 
       /**
        * Select the given tab.
@@ -144,7 +133,7 @@ define("ivy-tabs/components/ivy-tab-list",
        * @param {Number} index
        */
       selectTabByIndex: function(index) {
-        this.set('selectedIndex', index);
+        this.set('selected-index', index);
       },
 
       /**
@@ -154,7 +143,7 @@ define("ivy-tabs/components/ivy-tab-list",
        * @type ivy.tabs.IvyTabsComponent
        * @readOnly
        */
-      tabsContainer: Ember.computed.alias('parentView').readOnly(),
+      tabsContainer: ember$$default.computed.alias('parentView').readOnly(),
 
       /**
        * Removes a tab from the `tabs` array.
@@ -167,8 +156,8 @@ define("ivy-tabs/components/ivy-tab-list",
         if (tab.get('isSelected')) { this.selectPreviousTab(); }
       },
 
-      _initTabs: Ember.on('init', function() {
-        this.set('tabs', Ember.A());
+      _initTabs: ember$$default.on('init', function() {
+        this.set('tabs', ember$$default.A());
       }),
 
       _registerWithTabsContainer: function() {
@@ -179,35 +168,20 @@ define("ivy-tabs/components/ivy-tab-list",
         this.get('tabsContainer').unregisterTabList(this);
       }
     });
-  });
-define("ivy-tabs/components/ivy-tab-panel",
-  ["ember","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Ember = __dependency1__["default"] || __dependency1__;
 
-    /**
-     * @module ivy-tabs
-     */
-
-    /**
-     * @class IvyTabPanelComponent
-     * @namespace ivy.tabs
-     * @extends Ember.Component
-     */
-    __exports__["default"] = Ember.Component.extend({
+    var components$ivy$tab$panel$$default = ember$$default.Component.extend({
       attributeBindings: ['aria-labelledby', 'role'],
       classNames: ['ivy-tab-panel'],
       classNameBindings: ['active'],
 
       init: function() {
         this._super();
-        Ember.run.once(this, this._registerWithTabsContainer);
+        ember$$default.run.once(this, this._registerWithTabsContainer);
       },
 
       willDestroy: function() {
         this._super();
-        Ember.run.once(this, this._unregisterWithTabsContainer);
+        ember$$default.run.once(this, this._unregisterWithTabsContainer);
       },
 
       /**
@@ -219,7 +193,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type String
        * @readOnly
        */
-      'aria-labelledby': Ember.computed.alias('tab.elementId').readOnly(),
+      'aria-labelledby': ember$$default.computed.alias('tab.elementId').readOnly(),
 
       /**
        * See http://www.w3.org/TR/wai-aria/roles#tabpanel
@@ -238,7 +212,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type String
        * @readOnly
        */
-      active: Ember.computed(function() {
+      active: ember$$default.computed(function() {
         if (this.get('isSelected')) { return this.get('activeClass'); }
       }).property('isSelected'),
 
@@ -258,7 +232,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @property index
        * @type Number
        */
-      index: Ember.computed(function() {
+      index: ember$$default.computed(function() {
         return this.get('tabPanels').indexOf(this);
       }).property('tabPanels.[]'),
 
@@ -269,7 +243,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type Boolean
        * @readOnly
        */
-      isSelected: Ember.computed.alias('tab.isSelected').readOnly(),
+      isSelected: ember$$default.computed.alias('tab.isSelected').readOnly(),
 
       /**
        * If `false`, this panel will appear hidden in the DOM. This is an alias to
@@ -279,7 +253,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type Boolean
        * @readOnly
        */
-      isVisible: Ember.computed.alias('isSelected').readOnly(),
+      isVisible: ember$$default.computed.alias('isSelected').readOnly(),
 
       /**
        * The `ivy-tab` associated with this panel.
@@ -287,7 +261,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @property tab
        * @type ivy.tabs.IvyTabComponent
        */
-      tab: Ember.computed(function() {
+      tab: ember$$default.computed(function() {
         var tabs = this.get('tabs');
         if (tabs) { return tabs.objectAt(this.get('index')); }
       }).property('tabs.[]', 'index'),
@@ -299,7 +273,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type ivy.tabs.IvyTabListComponent
        * @readOnly
        */
-      tabList: Ember.computed.alias('tabsContainer.tabList').readOnly(),
+      tabList: ember$$default.computed.alias('tabsContainer.tabList').readOnly(),
 
       /**
        * The array of all `ivy-tab-panel` instances within the `ivy-tabs`
@@ -309,7 +283,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type Array | ivy.tabs.IvyTabPanelComponent
        * @readOnly
        */
-      tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
+      tabPanels: ember$$default.computed.alias('tabsContainer.tabPanels').readOnly(),
 
       /**
        * The array of all `ivy-tab` instances within the `ivy-tab-list` component.
@@ -318,7 +292,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type Array | ivy.tabs.IvyTabComponent
        * @readOnly
        */
-      tabs: Ember.computed.alias('tabList.tabs').readOnly(),
+      tabs: ember$$default.computed.alias('tabList.tabs').readOnly(),
 
       /**
        * The `ivy-tabs` component.
@@ -327,7 +301,7 @@ define("ivy-tabs/components/ivy-tab-panel",
        * @type ivy.tabs.IvyTabsComponent
        * @readOnly
        */
-      tabsContainer: Ember.computed.alias('parentView').readOnly(),
+      tabsContainer: ember$$default.computed.alias('parentView').readOnly(),
 
       _registerWithTabsContainer: function() {
         this.get('tabsContainer').registerTabPanel(this);
@@ -337,23 +311,8 @@ define("ivy-tabs/components/ivy-tab-panel",
         this.get('tabsContainer').unregisterTabPanel(this);
       }
     });
-  });
-define("ivy-tabs/components/ivy-tab",
-  ["ember","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Ember = __dependency1__["default"] || __dependency1__;
 
-    /**
-     * @module ivy-tabs
-     */
-
-    /**
-     * @class IvyTabComponent
-     * @namespace ivy.tabs
-     * @extends Ember.Component
-     */
-    __exports__["default"] = Ember.Component.extend({
+    var components$ivy$tab$$default = ember$$default.Component.extend({
       tagName: 'li',
       attributeBindings: ['aria-controls', 'aria-expanded', 'aria-selected', 'role', 'selected', 'tabindex'],
       classNames: ['ivy-tab'],
@@ -361,12 +320,12 @@ define("ivy-tabs/components/ivy-tab",
 
       init: function() {
         this._super();
-        Ember.run.once(this, this._registerWithTabList);
+        ember$$default.run.once(this, this._registerWithTabList);
       },
 
       willDestroy: function() {
         this._super();
-        Ember.run.once(this, this._unregisterWithTabList);
+        ember$$default.run.once(this, this._unregisterWithTabList);
       },
 
       /**
@@ -378,7 +337,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type String
        * @readOnly
        */
-      'aria-controls': Ember.computed.alias('tabPanel.elementId').readOnly(),
+      'aria-controls': ember$$default.computed.alias('tabPanel.elementId').readOnly(),
 
       /**
        * Tells screenreaders whether or not this tab's panel is expanded.
@@ -389,7 +348,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type String
        * @readOnly
        */
-      'aria-expanded': Ember.computed.alias('aria-selected').readOnly(),
+      'aria-expanded': ember$$default.computed.alias('aria-selected').readOnly(),
 
       /**
        * Tells screenreaders whether or not this tab is selected.
@@ -399,7 +358,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property aria-selected
        * @type String
        */
-      'aria-selected': Ember.computed(function() {
+      'aria-selected': ember$$default.computed(function() {
         return this.get('isSelected') + ''; // coerce to 'true' or 'false'
       }).property('isSelected'),
 
@@ -422,7 +381,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property selected
        * @type String
        */
-      selected: Ember.computed(function() {
+      selected: ember$$default.computed(function() {
         if (this.get('isSelected')) { return 'selected'; }
       }).property('isSelected'),
 
@@ -433,7 +392,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property tabindex
        * @type Number
        */
-      tabindex: Ember.computed(function() {
+      tabindex: ember$$default.computed(function() {
         if (this.get('isSelected')) { return 0; }
       }).property('isSelected'),
 
@@ -445,7 +404,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type String
        * @readOnly
        */
-      active: Ember.computed(function() {
+      active: ember$$default.computed(function() {
         if (this.get('isSelected')) { return this.get('activeClass'); }
       }).property('isSelected'),
 
@@ -465,7 +424,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property index
        * @type Number
        */
-      index: Ember.computed(function() {
+      index: ember$$default.computed(function() {
         return this.get('tabs').indexOf(this);
       }).property('tabs.[]'),
 
@@ -475,7 +434,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property isSelected
        * @type Boolean
        */
-      isSelected: Ember.computed(function() {
+      isSelected: ember$$default.computed(function() {
         return this.get('tabList.selectedTab') === this;
       }).property('tabList.selectedTab'),
 
@@ -484,7 +443,7 @@ define("ivy-tabs/components/ivy-tab",
        *
        * @method select
        */
-      select: Ember.on('click', function() {
+      select: ember$$default.on('click', function() {
         this.get('tabList').selectTab(this);
       }),
 
@@ -495,7 +454,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type ivy.tabs.IvyTabListComponent
        * @readOnly
        */
-      tabList: Ember.computed.alias('parentView').readOnly(),
+      tabList: ember$$default.computed.alias('parentView').readOnly(),
 
       /**
        * The `ivy-tab-panel` associated with this tab.
@@ -503,7 +462,7 @@ define("ivy-tabs/components/ivy-tab",
        * @property tabPanel
        * @type ivy.tabs.IvyTabPanelComponent
        */
-      tabPanel: Ember.computed(function() {
+      tabPanel: ember$$default.computed(function() {
         return this.get('tabPanels').objectAt(this.get('index'));
       }).property('tabPanels.[]', 'index'),
 
@@ -515,7 +474,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type Array | ivy.tabs.IvyTabPanelComponent
        * @readOnly
        */
-      tabPanels: Ember.computed.alias('tabsContainer.tabPanels').readOnly(),
+      tabPanels: ember$$default.computed.alias('tabsContainer.tabPanels').readOnly(),
 
       /**
        * The array of all `ivy-tab` instances within the `ivy-tab-list` component.
@@ -524,7 +483,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type Array | ivy.tabs.IvyTabComponent
        * @readOnly
        */
-      tabs: Ember.computed.alias('tabList.tabs').readOnly(),
+      tabs: ember$$default.computed.alias('tabList.tabs').readOnly(),
 
       /**
        * The `ivy-tabs` component.
@@ -533,7 +492,7 @@ define("ivy-tabs/components/ivy-tab",
        * @type ivy.tabs.IvyTabsComponent
        * @readOnly
        */
-      tabsContainer: Ember.computed.alias('tabList.tabsContainer').readOnly(),
+      tabsContainer: ember$$default.computed.alias('tabList.tabsContainer').readOnly(),
 
       _registerWithTabList: function() {
         this.get('tabList').registerTab(this);
@@ -543,23 +502,8 @@ define("ivy-tabs/components/ivy-tab",
         this.get('tabList').unregisterTab(this);
       }
     });
-  });
-define("ivy-tabs/components/ivy-tabs",
-  ["ember","exports"],
-  function(__dependency1__, __exports__) {
-    "use strict";
-    var Ember = __dependency1__["default"] || __dependency1__;
 
-    /**
-     * @module ivy-tabs
-     */
-
-    /**
-     * @class IvyTabsComponent
-     * @namespace ivy.tabs
-     * @extends Ember.Component
-     */
-    __exports__["default"] = Ember.Component.extend({
+    var components$ivy$tabs$$default = ember$$default.Component.extend({
       classNames: ['ivy-tabs'],
 
       init: function() {
@@ -568,15 +512,30 @@ define("ivy-tabs/components/ivy-tabs",
       },
 
       /**
+       * @deprecated Use selected-index instead.
+       * @property selectedIndex
+       */
+      selectedIndex: ember$$default.computed(function(key, value) {
+        ember$$default.deprecate('Usage of `selectedIndex` is deprecated, use `selected-index` instead.');
+
+        if (arguments.length > 1) {
+          this.set('selected-index', value);
+          return value;
+        } else {
+          return this.get('selected-index');
+        }
+      }),
+
+      /**
        * Set this to the index of the tab you'd like to be selected. Usually it is
        * bound to a controller property that is used as a query parameter, but can
        * be bound to anything.
        *
-       * @property selectedIndex
+       * @property selected-index
        * @type Number
        * @default 0
        */
-      selectedIndex: 0,
+      'selected-index': 0,
 
       /**
        * Registers the `ivy-tab-list` instance.
@@ -619,43 +578,38 @@ define("ivy-tabs/components/ivy-tabs",
       },
 
       _initTabPanels: function() {
-        this.set('tabPanels', Ember.A());
+        this.set('tabPanels', ember$$default.A());
       }
     });
-  });
-define("ivy-tabs/initializer",
-  ["./components/ivy-tab","./components/ivy-tab-list","./components/ivy-tab-panel","./components/ivy-tabs","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __exports__) {
-    "use strict";
-    var IvyTabComponent = __dependency1__["default"] || __dependency1__;
-    var IvyTabListComponent = __dependency2__["default"] || __dependency2__;
-    var IvyTabPanelComponent = __dependency3__["default"] || __dependency3__;
-    var IvyTabsComponent = __dependency4__["default"] || __dependency4__;
 
-    __exports__["default"] = {
+    var initializer$$default = {
       name: 'ivy-tabs',
 
       initialize: function(container) {
-        container.register('component:ivy-tab', IvyTabComponent);
-        container.register('component:ivy-tab-list', IvyTabListComponent);
-        container.register('component:ivy-tab-panel', IvyTabPanelComponent);
-        container.register('component:ivy-tabs', IvyTabsComponent);
+        container.register('component:ivy-tab', components$ivy$tab$$default);
+        container.register('component:ivy-tab-list', components$ivy$tab$list$$default);
+        container.register('component:ivy-tab-panel', components$ivy$tab$panel$$default);
+        container.register('component:ivy-tabs', components$ivy$tabs$$default);
       }
     };
-  });
-define("ivy-tabs",
-  ["./components/ivy-tab","./components/ivy-tab-list","./components/ivy-tab-panel","./components/ivy-tabs","./initializer","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __exports__) {
-    "use strict";
-    var IvyTabComponent = __dependency1__["default"] || __dependency1__;
-    var IvyTabListComponent = __dependency2__["default"] || __dependency2__;
-    var IvyTabPanelComponent = __dependency3__["default"] || __dependency3__;
-    var IvyTabsComponent = __dependency4__["default"] || __dependency4__;
-    var initializer = __dependency5__["default"] || __dependency5__;
 
-    __exports__.IvyTabComponent = IvyTabComponent;
-    __exports__.IvyTabListComponent = IvyTabListComponent;
-    __exports__.IvyTabPanelComponent = IvyTabPanelComponent;
-    __exports__.IvyTabsComponent = IvyTabsComponent;
-    __exports__.initializer = initializer;
-  });
+    var ivy$tabs$umd$$tabs = {
+      'IvyTabComponent': components$ivy$tab$$default,
+      'IvyTabListComponent': components$ivy$tab$list$$default,
+      'IvyTabPanelComponent': components$ivy$tab$panel$$default,
+      'IvyTabsComponent': components$ivy$tabs$$default,
+      'initializer': initializer$$default
+    };
+
+    /* global define module window */
+    if (typeof define === 'function' && define['amd']) {
+      define(function() { return ivy$tabs$umd$$tabs; });
+    } else if (typeof module !== 'undefined' && module['exports']) {
+      module['exports'] = ivy$tabs$umd$$tabs;
+    } else if (typeof this !== 'undefined') {
+      this['ivy'] = this['ivy'] || {};
+      this['ivy']['tabs'] = ivy$tabs$umd$$tabs;
+    }
+}).call(this);
+
+//# sourceMappingURL=ivy-tabs.js.map
