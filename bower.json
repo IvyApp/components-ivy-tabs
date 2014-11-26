@@ -1,11 +1,11 @@
 {
   "name": "ivy-tabs",
-  "version": "0.3.0",
+  "version": "1.0.0-beta.2+canary",
   "authors": [
     "Dray Lacy"
   ],
-  "description": "WAI-ARIA accessible tab component for Ember.",
-  "main": "./ivy-tabs.js",
+  "description": "WAI-ARIA accessible tabs for Ember.",
+  "main": "./ivy-tabs-1.0.0-beta.2+canary.js",
   "keywords": [
     "ember",
     "tabs"
