@@ -593,7 +593,7 @@
       }
     };
 
-    var ivy$tabs$umd$$tabs = {
+    var ivy$tabs$umd$$IvyTabs = {
       'IvyTabComponent': components$ivy$tab$$default,
       'IvyTabListComponent': components$ivy$tab$list$$default,
       'IvyTabPanelComponent': components$ivy$tab$panel$$default,
@@ -603,12 +603,11 @@
 
     /* global define module window */
     if (typeof define === 'function' && define['amd']) {
-      define(function() { return ivy$tabs$umd$$tabs; });
+      define(function() { return ivy$tabs$umd$$IvyTabs; });
     } else if (typeof module !== 'undefined' && module['exports']) {
-      module['exports'] = ivy$tabs$umd$$tabs;
+      module['exports'] = ivy$tabs$umd$$IvyTabs;
     } else if (typeof this !== 'undefined') {
-      this['ivy'] = this['ivy'] || {};
-      this['ivy']['tabs'] = ivy$tabs$umd$$tabs;
+      this['IvyTabs'] = ivy$tabs$umd$$IvyTabs;
     }
 }).call(this);
 
