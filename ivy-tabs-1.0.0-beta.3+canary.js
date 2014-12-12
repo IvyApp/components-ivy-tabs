@@ -781,16 +781,16 @@ var define, requireModule, require, requirejs;
 
     __exports__["default"] = IvyTabsComponent;
   });
-;define('ivy-tabs-shim', ["exports"], function(__exports__) {__exports__.initialize = function(container){
-container.register('component:ivy-tab-list', require('app/components/ivy-tab-list')['default']);
-container.register('component:ivyTabList', require('app/components/ivy-tab-list')['default']);
-container.register('component:ivy-tab-panel', require('app/components/ivy-tab-panel')['default']);
-container.register('component:ivyTabPanel', require('app/components/ivy-tab-panel')['default']);
-container.register('component:ivy-tab', require('app/components/ivy-tab')['default']);
-container.register('component:ivyTab', require('app/components/ivy-tab')['default']);
-container.register('component:ivy-tabs', require('app/components/ivy-tabs')['default']);
-container.register('component:ivyTabs', require('app/components/ivy-tabs')['default']);
-};});
+;/* global define, require */
+define('ivy-tabs-shim', ['exports'], function(__exports__) {
+  'use strict';
+  __exports__['default'] = function(container) {
+    container.register('component:ivy-tab-list', require('ivy-tabs/components/ivy-tab-list')['default']);
+    container.register('component:ivy-tab-panel', require('ivy-tabs/components/ivy-tab-panel')['default']);
+    container.register('component:ivy-tab', require('ivy-tabs/components/ivy-tab')['default']);
+    container.register('component:ivy-tabs', require('ivy-tabs/components/ivy-tabs')['default']);
+  };
+});
 ;/* global define, require, window */
 var addonName = 'ivy-tabs';
 
@@ -801,7 +801,7 @@ define('ember', ['exports'], function(__exports__) {
 var index = addonName + '/index';
 define(addonName, ['exports'], function(__exports__) {
   var library = require(index);
-  Object.keys(lf).forEach(function(key) {
+  Object.keys(library).forEach(function(key) {
     __exports__[key] = library[key];
   });
 });
@@ -815,7 +815,7 @@ window.Ember.Application.initializer({
   name: shim,
 
   initialize: function(container) {
-    require(shim).initialize(container);
+    require(shim)['default'](container);
   }
 });
 })();
