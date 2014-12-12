@@ -1,4 +1,4 @@
-(function(){;
+(function() {;
 var define, requireModule, require, requirejs;
 
 (function() {
