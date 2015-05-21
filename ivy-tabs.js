@@ -785,6 +785,7 @@ var define, requireModule, require, requirejs;
        */
       registerTabList: function(tabList) {
         this.set('tabList', tabList);
+        Ember.run.once(this, this._selectTabByIndex);
       },
 
       /**
@@ -819,6 +820,12 @@ var define, requireModule, require, requirejs;
 
       _initTabPanels: function() {
         this.set('tabPanels', Ember.A());
+      },
+
+      _selectTabByIndex: function() {
+        var selectedIndex = this.get('selected-index');
+        if (Ember.isNone(selectedIndex)) { selectedIndex = 0; }
+        this.get('tabList').selectTabByIndex(selectedIndex);
       }
     });
   });
