@@ -362,8 +362,16 @@ var define, requireModule, require, requirejs;
        * @param {IvyTabs.IvyTabComponent} tab
        */
       unregisterTab: function(tab) {
+        var index = tab.get('index');
         this.get('tabs').removeObject(tab);
-        if (tab.get('isSelected')) { this.selectPreviousTab(); }
+
+        if (index < this.get('selected-index')) {
+          this.selectPreviousTab();
+        } else if (tab.get('isSelected')) {
+          if (index !== 0) {
+            this.selectPreviousTab();
+          }
+        }
       },
 
       _initTabs: Ember.on('init', function() {
